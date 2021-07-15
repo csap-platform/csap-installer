@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+ 
+    <parent>
+       <groupId>com.sensus.docker</groupId>
+       <artifactId>csap_installer</artifactId>
+       <version>1.0-SNAPSHOT</version>
+    </parent>
+
+  <packaging>pom</packaging>
+  <artifactId>scripts</artifactId>
+ 
+  <build>
+    <plugins>
+        <plugin>
+           <groupId>com.google.code.maven-replacer-plugin</groupId>
+           <artifactId>replacer</artifactId>
+           <version>1.5.3</version>
+           <executions>
+              <execution>
+                 <phase>prepare-package</phase>
+                 <goals>
+                    <goal>replace</goal>
+                 </goals>
+              </execution>
+           </executions>
+           <configuration>
+              <outputBasedir>${basedir}/target</outputBasedir>
+              <outputDir>scripts</outputDir>
+              <preserveDir>false</preserveDir>
+              <includes>
+                 <include>${basedir}/scripts/**.sh</include>
+              </includes>
+              <replacements>
+                 <replacement>
+                    <token>%REGISTRY_IMAGE%</token>
+                    <value>${registry-name}</value>
+                 </replacement>
+                 <replacement>
+                    <token>%REGISTRY_FILENAME%</token>
+                    <value>${registry-filename}</value>
+                 </replacement>
+                 <replacement>
+                    <token>%REGISTRY_DEPLOY_IMAGE%</token>
+                    <value>${registry-deploy-name}</value>
+                 </replacement>
+                 <replacement>
+                    <token>%REGISTRY_DEPLOY_FILENAME%</token>
+                    <value>${registry-deploy-filename}</value>
+                 </replacement>
+                 <replacement>
+                    <token>%IMAGES_FILENAME%</token>
+                    <value>${image-tar-filename}</value>
+                 </replacement>
+              </replacements>
+           </configuration>
+        </plugin>
+    </plugins>
+  </build>
+</project>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+ 
+    <groupId>com.sensus.docker</groupId>
+    <artifactId>csap_installer</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>csap-install</name>
+   
+ 
+    <properties>
+        <!-- tags to change for build --> 
+        <registry-deploy-tag>0.1</registry-deploy-tag>
+        <registry-tag>2.6.2</registry-tag>
+        <image-tar-tag>0.1</image-tar-tag>
+
+        <!-- properties that do not need to change per build -->
+        <registry-deploy-name>sensus/registry_deploy:${registry-deploy-tag}</registry-deploy-name> 
+        <registry-deploy-filename>registry_deploy-${registry-deploy-tag}.tar.gz</registry-deploy-filename>
+
+        <registry-name>sensus/registry:${registry-tag}</registry-name> 
+        <registry-filename>registry-${registry-tag}.tar.gz</registry-filename>
+
+        <image-builder-name>sensus/image_builder:${image-tar-tag}</image-builder-name> 
+        <image-builder-filename>image_builder-${image-tar-tag}.tar.gz</image-builder-filename>
+        <image-tar-filename>platform_images-${image-tar-tag}.tar.gz</image-tar-filename>
+    </properties>
+
+   <build>
+      <pluginManagement>
+         <plugins>
+            <plugin>
+              <groupId>io.fabric8</groupId>
+              <artifactId>docker-maven-plugin</artifactId>
+              <version>0.27.2</version>
+             <executions>
+               <execution>
+                 <id>save</id>
+                 <phase>package</phase>
+                 <goals>
+                   <goal>build</goal>
+                   <goal>save</goal>
+                  </goals>
+                </execution>
+              </executions>
+           </plugin>
+        </plugins>
+     </pluginManagement>
+  </build>
+         
+
+   <modules>
+      <module>registry_deploy</module>
+      <module>registry</module>
+      <module>image_tar</module>
+      <module>scripts</module>
+      <module>assembly</module>
+   </modules>
+
+</project>

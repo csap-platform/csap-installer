@@ -1,0 +1,12 @@
+import java.text.SimpleDateFormat
+
+def dateFormat = new SimpleDateFormat("yyyyMMdd")
+def timestamp = dateFormat.format(new Date()) 
+def tag = "${timestamp}-SNAPSHOT"
+//def config = readJSON file: 'git-conf.json'
+
+template parentPom: './pom.xml',
+    poms: 'host/pom.xml, client/pom.xml',
+    props: [PARENT_VERSION: tag, TAG_NAME: tag],
+    skipDeploy: true,
+    externalTagsFile: 'git-conf.json'

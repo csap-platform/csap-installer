@@ -1,0 +1,201 @@
+pipeline {
+  	
+  	agent {
+        label 'csap-build-cluster'
+    }
+
+    tools {
+        maven 'Maven_3.3.9'
+        jdk 'OpenJDK11'
+    }
+
+    stages {
+        stage('Setup') {
+            steps {
+                script {
+                	
+                	utils.print_header "Build params: ${params}"
+                    
+                    def configFile = 'release-conf.json'
+                    def props = readJSON file: configFile
+                    def buildParams = []
+
+                    // add build parameters in order
+                    buildParams+=createBuildParam('installer', props)
+                    buildParams+=createBuildParam('csap-starter', props)
+                    buildParams+=createBuildParam('csap-core-service', props)
+                    buildParams+=createBuildParam('csap-events', props)
+                    buildParams+=createBuildParam('csap-java-servlet', props)
+                    buildParams+=createBuildParam('csap-package', props)
+                    buildParams+=createBuildParam('csap-package-java', props)
+                    buildParams+=createBuildParam('csap-package-linux', props)
+                    buildParams+=createBuildParam('csap-package-logging', props)
+                    buildParams+=createBuildParam('csap-package-monitoring', props)
+                    buildParams+=createBuildParam('csap-package-httpd', props)
+                    buildParams+=createBuildParam('csap-package-tomcat', props)
+                    buildParams+=createBuildParam('csap-package-docker', props)
+                    buildParams+=createBuildParam('csap-package-kubelet', props)
+                    buildParams+=createBuildParam('csap-bin', props)
+                    buildParams+=createBuildParam('csap-bin-java', props)
+                    buildParams+=createBuildParam('csap-bin-linux', props)
+                    buildParams+=createBuildParam('csap-bin-monitoring', props)
+                    buildParams+=createBuildParam('csap-bin-tomcat', props)
+                    buildParams+=createBuildParam('csap-bin-httpd', props)
+                    buildParams+=createBuildParam('csap-package-java-secondary', props)
+            		buildParams+=createBuildParam('csap-package-linux-secondary', props)
+    				buildParams+=createBuildParam('csap-package-monitoring-secondary', props)
+					buildParams+=createBuildParam('csap-package-tomcat-secondary', props)
+					buildParams+=createBuildParam('csap-package-httpd-uber', props)
+                    
+
+                    utils.print_header "Filtered params into list: ${buildParams}"
+                    properties([parameters(buildParams)])
+
+                    //
+                    // build java services
+                    //
+                    parentBuild('release-csap-starter', 'csap-starter', props, ['csap-starter-tester'])
+                    parentChildBuild('release-csap-core', 'csap-starter', 'csap-core-service', props)
+                    parentChildBuild('release-csap-events', 'csap-starter', 'csap-events', props)
+                    
+                    //childBuild('release-csap-java', 'csap-java-servlet', props)
+
+                    //
+                    // build packages
+                    //
+                    childBuild('release-csap-package', 'csap-package', props)
+                    parentChildBuild('release-csap-package-java', 'csap-package', 'csap-package-java', props)
+                    parentChildBuild('release-csap-package-linux', 'csap-package', 'csap-package-linux', props)
+                    parentChildBuild('release-csap-package-logging', 'csap-package', 'csap-package-logging', props)
+                    parentChildBuild('release-csap-package-monitoring', 'csap-package', 'csap-package-monitoring', props)
+                    parentChildBuild('release-csap-package-httpd', 'csap-package', 'csap-package-httpd', props)
+                    parentChildBuild('release-csap-package-tomcat', 'csap-package', 'csap-package-tomcat', props)
+                    parentChildBuild('release-csap-package-docker', 'csap-package', 'csap-package-docker', props)
+                    parentChildBuild('release-csap-package-kubelet', 'csap-package', 'csap-package-kubelet', props)
+
+                    //
+                    // build binary packages: simple zips containing binary files
+                    //
+                    childBuild('release-csap-bin', 'csap-bin', props)
+                    parentChildBuild('release-csap-bin-java', 'csap-bin', 'csap-bin-java', props) 
+                    parentChildBuild('release-csap-bin-linux', 'csap-bin', 'csap-bin-linux', props)
+                    parentChildBuild('release-csap-bin-monitoring', 'csap-bin', 'csap-bin-monitoring', props)
+                    parentChildBuild('release-csap-bin-tomcat', 'csap-bin', 'csap-bin-tomcat', props)
+                    parentChildBuild('release-csap-bin-httpd', 'csap-bin', 'csap-bin-httpd', props)
+
+                    // build installer stuff 
+                    updateVersion('mavenVersion', props, [])
+                    
+                    
+                    installerBuild('release-installer', 'installer', configFile, props, ['csap-host', 'csap-client'])
+ 
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            script {
+                utils.postProcessing('peter.nightingale@xyleminc.com', true)
+            }
+        }
+    }
+}
+
+def createBuildParam(String paramName, Map props) {
+    return [
+        string(defaultValue: params[paramName]?:props[paramName], description: "Build version of ${paramName}", name: paramName),
+        booleanParam(defaultValue: false, description: "Force a build of ${paramName}", name: paramName + 'Force')
+    ]
+}
+
+def updateVersion(String name, Map props, List copiedProps) {
+	
+    def version = params[name]?:props[name]
+    props[name] = version
+    copiedProps.each{ copyProp -> props[copyProp] = version }
+    
+}
+
+def forceTagging(String name) {
+    return booleanParam(name: params[name+'Force']?'FORCE_TAG':'SKIP_BUILD_IF_TAGGED', value: true)
+}
+
+def parentBuild(String jobName, String parentName, Map props, List copiedProps = []) {
+    updateVersion(parentName, props, copiedProps)
+    utils.print_header "Building ${parentName} with version: ${props[parentName]}"
+    build job: jobName,
+        parameters: [
+            string(name: 'PARENT_VERSION', value: props[parentName]),
+            forceTagging(parentName)
+        ]
+}
+
+
+def childBuild(String jobName, String childName, Map props, List copiedProps = []) {
+    updateVersion(childName, props, copiedProps)
+    utils.print_header "Building ${childName} with version: ${props[childName]}"
+    build job: jobName, 
+        parameters: [
+            string(name: 'VERSION', value: props[childName]),
+            forceTagging(childName)
+        ]
+}
+
+def parentChildBuild(String jobName, String parentName, String childName, Map props, List copiedProps = []) {
+	
+    updateVersion(childName, props, copiedProps)
+    
+    utils.print_header "Building ${childName}  version: ${props[childName]} with parent: ${props[parentName]}"
+    
+    build job: jobName,
+        parameters: [
+            string(name: 'PARENT_VERSION', value: props[parentName]),
+            string(name: 'VERSION', value: props[childName]),
+            forceTagging(childName)
+        ]
+        		
+}
+
+def installerBuild(String jobName, String installerName, String configFile, Map props, List copiedProps = []) {
+	
+	utils.print_header "installerBuild ${installerName} updating file: ${ configFile }"
+
+    updateVersion(installerName, props, copiedProps)
+    
+    // legacy hook for secondary/bin packages
+    updateVersion("csap-package-java-secondary", props, copiedProps)
+    updateVersion("csap-package-linux-secondary", props, copiedProps)
+    updateVersion("csap-package-monitoring-secondary", props, copiedProps)
+    updateVersion("csap-package-tomcat-secondary", props, copiedProps)
+    updateVersion("csap-package-httpd-uber", props, copiedProps)
+    
+    utils.print_header "Writing: ${props}"
+    
+    writeJSON json: props, file: configFile, pretty:4
+    
+    def diff = sh returnStdout: true, script: "git diff ${configFile}"
+    	
+    if (diff) {
+    	def sessionUser = "bb-cloud-builder"
+        utils.print_header "starting ssagent session as user $sessionUser"
+                
+        sshagent(credentials : [ "$sessionUser" ]) {
+	        utils.print_header "Checking in changed config: ${diff}"
+	        sh "cat ${configFile}"
+	        sh "git add ${configFile}"
+	        sh "git commit -m \"Update ${configFile}\""
+	        sh 'git push'
+    	}
+        
+    }
+
+    utils.print_header "Building ${installerName} with version: ${props[installerName]}"
+    // Note: we can't skip the installer build, just force it.
+    build job: jobName,
+        parameters: [
+            string(name: 'PARENT_VERSION', value: props[installerName]),
+            booleanParam(name: 'FORCE_TAG', value: params[installerName+'Force'])
+        ]
+}

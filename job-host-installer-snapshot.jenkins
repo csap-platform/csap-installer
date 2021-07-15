@@ -1,0 +1,2 @@
+template parentPom: './pom.xml',
+    poms: 'host/pom.xml, client/pom.xml'

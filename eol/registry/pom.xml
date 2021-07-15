@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+ 
+    <parent>
+       <groupId>com.sensus.docker</groupId>
+       <artifactId>csap_installer</artifactId>
+       <version>1.0-SNAPSHOT</version>
+    </parent>
+
+  <packaging>pom</packaging>
+  <artifactId>registry</artifactId>
+
+  <properties>
+     <docker.save.name>${registry-name}</docker.save.name>
+     <docker.save.file>${basedir}/target/${registry-filename}</docker.save.file>
+  </properties>
+ 
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>io.fabric8</groupId>
+        <artifactId>docker-maven-plugin</artifactId> 
+        <configuration>
+          <images>
+              <image>
+                  <name>${registry-name}</name>
+                  <alias>registry</alias>
+                  <build>
+                      <dockerFile>${project.basedir}/docker/Dockerfile</dockerFile>
+                  </build>
+              </image>
+          </images>
+       </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

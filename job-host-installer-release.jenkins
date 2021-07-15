@@ -1,0 +1,8 @@
+template parentPom: './pom.xml',
+    poms: 'host/pom.xml, client/pom.xml',
+    propsFile: 'release-conf.json',
+    props: ["installer-conf": "../release-conf.json"],
+    enableParentVersion: true,
+    enableTag: true,
+    defaultTag: 'csap-installer'
+

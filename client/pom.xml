@@ -1,0 +1,70 @@
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.csap</groupId>
+        <artifactId>csap-installer</artifactId>
+        <version>2-SNAPSHOT</version>
+    </parent>
+
+    <packaging>pom</packaging>
+    <artifactId>csap-client</artifactId>
+
+    <name>${project.groupId}:${project.artifactId}</name>
+    <description>csap installer client</description>
+    <url>https://github.com/csap-platform/csap-core/wiki</url>
+
+    <properties>
+        <working>${project.build.directory}/working</working>
+
+        <!-- versions -->
+        <csap-core-service>2-SNAPSHOT</csap-core-service>
+        <csap-package-linux>2-SNAPSHOT</csap-package-linux>
+    </properties>
+
+
+    <build>
+        <defaultGoal>clean package</defaultGoal>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unzip</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.csap</groupId>
+                                    <artifactId>csap-core-service</artifactId>
+                                    <version>${csap-core-service}</version>
+                                    <outputDirectory>${working}/core/</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.csap</groupId>
+                                    <artifactId>csap-package-linux</artifactId>
+                                    <version>${csap-package-linux}</version>
+                                    <type>zip</type>
+                                    <outputDirectory>${working}/scripts</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin> 
+                <artifactId>maven-assembly-plugin</artifactId> 
+            </plugin>
+        </plugins>
+
+    </build>
+</project>

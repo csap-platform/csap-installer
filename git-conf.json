@@ -1,0 +1,8 @@
+[
+    "ssh://git@moc-bb.lab.sensus.net:7999/csap/csap-starter.git",
+    "ssh://git@moc-bb.lab.sensus.net:7999/csap/csap-core.git",
+    "ssh://git@moc-bb.lab.sensus.net:7999/csap/csap-event-services.git",
+    "ssh://git@moc-bb.lab.sensus.net:7999/csap/csap-java.git",
+    "ssh://git@moc-bb.lab.sensus.net:7999/csap/csap-images.git",
+    "ssh://git@moc-bb.lab.sensus.net:7999/csap/csap-packages.git"
+]
