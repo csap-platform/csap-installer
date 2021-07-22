@@ -3,7 +3,7 @@
     "csap-starter": "2.5.2.1",
     "csap-starter-tester": "2.5.2.1",
     "csap-core-service": "21.06.1",
-    "csap-events": "21.06",
+    "csap-events": "21.06.1",
     "csap-java-servlet": "20.12",
     "csap-package-parent": "20.12",
     "csap-package-java": "21.06",
