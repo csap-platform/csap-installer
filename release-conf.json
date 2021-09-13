@@ -8,7 +8,7 @@
     "csap-package-parent": "20.12",
     "csap-package-java": "21.06",
     "csap-package-linux": "21.08",
-    "csap-package-logging": "21.06",
+    "csap-package-logging": "21.08",
     "csap-package-monitoring": "21.06",
     "csap-package-httpd": "21.08",
     "csap-package-tomcat": "21.06",
