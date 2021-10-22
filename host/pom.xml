@@ -37,6 +37,8 @@ http://maven.apache.org/maven-v4_0_0.xsd">
         <csap-package-tomcat>2-SNAPSHOT</csap-package-tomcat>
         <csap-package-tomcat-secondary>2-SNAPSHOT</csap-package-tomcat-secondary>
         <csap-package-docker>2-SNAPSHOT</csap-package-docker>
+        <csap-package-crio>2-SNAPSHOT</csap-package-crio>
+        <csap-package-podman>2-SNAPSHOT</csap-package-podman>
         <csap-package-kubelet>2-SNAPSHOT</csap-package-kubelet>
         <csap-package-httpd>2-SNAPSHOT</csap-package-httpd>
         <csap-package-httpd-uber>2-SNAPSHOT</csap-package-httpd-uber>
@@ -125,6 +127,22 @@ http://maven.apache.org/maven-v4_0_0.xsd">
                                     <type>zip</type>
                                     <outputDirectory>${csap-packages}/</outputDirectory>
                                     <destFileName>docker.zip</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.csap</groupId>
+                                    <artifactId>csap-package-podman</artifactId>
+                                    <version>${csap-package-podman}</version>
+                                    <type>zip</type>
+                                    <outputDirectory>${csap-packages}/</outputDirectory>
+                                    <destFileName>podman-system-service.zip</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.csap</groupId>
+                                    <artifactId>csap-package-crio</artifactId>
+                                    <version>${csap-package-crio}</version>
+                                    <type>zip</type>
+                                    <outputDirectory>${csap-packages}/</outputDirectory>
+                                    <destFileName>crio.zip</destFileName>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.csap</groupId>

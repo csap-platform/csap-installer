@@ -6,7 +6,7 @@ pipeline {
 
     tools {
         maven 'Maven_3.3.9'
-        jdk 'OpenJDK11'
+        jdk 'OpenJDK11U'
     }
 
     stages {
@@ -35,6 +35,8 @@ pipeline {
                     buildParams+=createBuildParam('csap-package-tomcat', props)
                     buildParams+=createBuildParam('csap-package-docker', props)
                     buildParams+=createBuildParam('csap-package-kubelet', props)
+            		buildParams+=createBuildParam('csap-package-podman', props)
+    				buildParams+=createBuildParam('csap-package-crio', props)
                     buildParams+=createBuildParam('csap-bin', props)
                     buildParams+=createBuildParam('csap-bin-java', props)
                     buildParams+=createBuildParam('csap-bin-linux', props)
@@ -72,6 +74,9 @@ pipeline {
                     parentChildBuild('release-csap-package-tomcat', 'csap-package', 'csap-package-tomcat', props)
                     parentChildBuild('release-csap-package-docker', 'csap-package', 'csap-package-docker', props)
                     parentChildBuild('release-csap-package-kubelet', 'csap-package', 'csap-package-kubelet', props)
+                    parentChildBuild('release-csap-package-podman', 'csap-package', 'csap-package-podman', props)
+                    parentChildBuild('release-csap-package-crio', 'csap-package', 'csap-package-crio', props)
+                    
 
                     //
                     // build binary packages: simple zips containing binary files
